@@ -1,11 +1,17 @@
 
 //TODO: Write an explanation of the Calibration algorithm
+
+#include <SPI.h>
+#include <Wire.h>
 #include "Encoder.h"
 
+#include "Parameters.h"
+#include "Utils.h"
 
 
 
-void Calibration() {
+
+void calibration() {
 
   int encoderReading = 0;     //or float?  not sure if we can average for more res?
   int lastencoderReading = 0;
