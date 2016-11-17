@@ -7,6 +7,7 @@
 #include "State.h" 
 #include "Utils.h"
 #include "Parameters.h"
+#include "Encoder.h"
 
 
 void TC5_Handler()

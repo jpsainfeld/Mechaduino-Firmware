@@ -4,14 +4,11 @@
 #include <SPI.h>
 #include <Wire.h>
 #include "Encoder.h"
-
 #include "Parameters.h"
 #include "Utils.h"
 
-
-
-
-void calibration() {
+void calibration() 
+{
 
   int encoderReading = 0;     //or float?  not sure if we can average for more res?
   int lastencoderReading = 0;
@@ -61,7 +58,6 @@ void calibration() {
       encoderReading += readEncoder();
       delay(10);
     }
-
     encoderReading = encoderReading / avg;
 
     anglefloat = encoderReading * 0.02197265625;
@@ -76,7 +72,6 @@ void calibration() {
     ticks = fullStepReadings[mod((i + 1), spr)] - fullStepReadings[mod((i), spr)];
     if (ticks < -15000) {
       ticks += cpr;
-
     }
     else if (ticks > 15000) {
       ticks -= cpr;
@@ -91,10 +86,8 @@ void calibration() {
           iStart = i;
           jStart = j;
         }
-
       }
     }
-
     if (ticks < 1) {
       for (int j = -ticks; j > 0; j--) {
         stepNo = (mod(fullStepReadings[spr-1 - i] + j, cpr));
@@ -103,17 +96,9 @@ void calibration() {
           iStart = i;
           jStart = j;
         }
-
       }
     }
-
-
-
   }
-
-
-
-
   SerialUSB.println(" ");
   SerialUSB.println("newLookup:");
   SerialUSB.println(" ");
@@ -139,7 +124,6 @@ void calibration() {
           SerialUSB.print(" , ");        
               }
       }
-      
       else if (i==(iStart+spr)){
         for (int j = 0; j < jStart; j++) {
           lookupAngle = 0.001 * mod(1000 * ((aps * i) + ((aps * j )/ float(ticks))), 360000.0);
@@ -154,9 +138,6 @@ void calibration() {
           SerialUSB.print(" , ");        
               }
       }
-    
-    
-    
     }
     
     else if (ticks < 1) {
@@ -180,15 +161,10 @@ void calibration() {
           SerialUSB.print(lookupAngle);
           SerialUSB.print(" , ");
         }
-      }
-            
+      }       
     }
-
-
   }
   SerialUSB.println(" ");
-
-
 }
 
 

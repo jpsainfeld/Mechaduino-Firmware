@@ -21,10 +21,6 @@
 	
 	void oneStep(void);
 		
-	int readEncoder();
-	
-	void readEncoderDiagnostics();
-		
 	void print_angle();
 		
 	void receiveEvent(int howMany);
