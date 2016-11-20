@@ -5,6 +5,7 @@
 #define __CALIBRATION_H__
 
 	void calibration();
+	void antiCoggingCal();
 
 #endif // __CALIBRATION_H__
 

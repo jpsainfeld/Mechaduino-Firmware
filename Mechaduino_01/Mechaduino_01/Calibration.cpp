@@ -6,6 +6,8 @@
 #include "Encoder.h"
 #include "Parameters.h"
 #include "Utils.h"
+#include "State.h"
+
 
 void calibration() 
 {
@@ -165,6 +167,34 @@ void calibration()
     }
   }
   SerialUSB.println(" ");
+}
+
+void antiCoggingCal() {
+  SerialUSB.println(" -----------------BEGIN ANTICOGGING CALIBRATION!----------------");
+  mode = 'x';
+  r = lookup_angle(1);
+  enableTCInterrupts();
+  delay(1000);
+
+
+  for (int i = 1; i < 657; i++) {
+    r = lookup_angle(i);
+    SerialUSB.print(r, DEC);
+    SerialUSB.print(" , ");
+    delay(100);
+    SerialUSB.println(u, DEC);
+  }
+  SerialUSB.println(" -----------------REVERSE!----------------");
+
+  for (int i = 656; i > 0; i--) {
+    r = lookup_angle(i);
+    SerialUSB.print(r, DEC);
+    SerialUSB.print(" , ");
+    delay(100);
+    SerialUSB.println(u, DEC);
+  }
+  SerialUSB.println(" -----------------DONE!----------------");
+  disableTCInterrupts();
 }
 
 

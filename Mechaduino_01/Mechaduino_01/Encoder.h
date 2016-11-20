@@ -5,6 +5,8 @@
 #define __ENCODER_H__
 
 	int readEncoder();
-  void readEncoderDiagnostics();    
+    unsigned short readEncoderNew(int comp);
+    void readEncoderDiagnostics();
+    void readEncoderDiagnosticsNew();
 
 #endif // __ENCODER_H__

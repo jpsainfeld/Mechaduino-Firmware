@@ -2,10 +2,32 @@
 
 #include <SPI.h>
 #include <Wire.h>
+#include "AS5047D.h"
 #include "Encoder.h"
 
 #include "Parameters.h"
 #include "Utils.h"
+
+
+
+// Read Encoder using the AS5047D driver
+
+unsigned short readEncoderNew(int comp)
+{
+    long angleTemp;
+    unsigned short wrk;
+    if ( comp == 1)
+    {
+        wrk = AS5047D_Read_Register(AS5047D_ANGLECOM);
+    }
+    else
+    {
+        wrk = AS5047D_Read_Register(AS5047D_ANGLEUNC);
+    }
+    SerialUSB.println(wrk);
+    return wrk;
+}
+
 
 
 int readEncoder()           //////////////////////////////////////////////////////   READENCODER   ////////////////////////////
@@ -24,7 +46,35 @@ int readEncoder()           ////////////////////////////////////////////////////
   digitalWrite(chipSelectPin, HIGH);
   return angleTemp;
 }
-  
+
+void readEncoderDiagnosticsNew()
+{
+    unsigned short wrk1 = 0;
+    unsigned char agc = 0;
+    
+    // Read Diagnostic and Automatic Gain Control Register
+    // and decode the diagnostic information
+    wrk1 = AS5047D_Read_Register(AS5047D_DIAAGC);
+    if ( wrk1 & DIAAGC_MAGL)
+    {
+        SerialUSB.print("  MAGL Magnetic field strength too low; AGC=0xFF, ");
+    }
+    if (wrk1 &  DIAAGC_MAGH)
+    {
+        SerialUSB.print("  MAGH Magnetic field strength too high; AGC=0x00, ");
+    }
+    if (wrk1 & DIAAGC_COF)
+    {
+        SerialUSB.print("  COF CORDIC overflow, ");
+    }
+    if (wrk1 & DIAAGC_LF )
+    {
+        SerialUSB.println("  LF  Offset compensation ");
+    }
+    agc = wrk1 & DIAAGC_AGC_VAL;
+    SerialUSB.print("");
+}
+
 
 void readEncoderDiagnostics()           //////////////////////////////////////////////////////   READENCODERDIAGNOSTICS   ////////////////////////////
 {

@@ -12,6 +12,8 @@
 #include "analogFastWrite.h"
 #include "Calibration.h"
 #include "Encoder.h"
+#include "AS5047D.h"
+
 
 
 void setupPins() {
@@ -50,17 +52,13 @@ void setupPins() {
 
 }
 
+// SPI Initialization
+
 void setupSPI() {
-
-  SPISettings settingsA(400000, MSBFIRST, SPI_MODE1);             ///400000, MSBFIRST, SPI_MODE1);
-
-  SPI.begin();    //AS5047D SPI uses mode=1 (CPOL=0, CPHA=1)
-  SerialUSB.println("Begin...");
-  delay(1000);
-  SPI.beginTransaction(settingsA);
-
+    AS5047D_Init();
 }
 
+// Step Interrupt Handler
 
 void stepInterrupt() {
   if (digitalRead(dir_pin))
@@ -75,6 +73,7 @@ void stepInterrupt() {
 
 }
 
+// A4954 function
 void output(float theta, int effort) {                    //////////////////////////////////////////   OUTPUT   ///////////////////
   static int start = 0;
   static int finish = 0;
@@ -107,11 +106,6 @@ void output(float theta, int effort) {                    //////////////////////
     //    PORTB |= (B00000010);
 
   }
-
-
-
-
-
   floatangle = (10000 * (  theta * 0.8726646 + 0.7854) );//2.3562) );//0.7854) );
   //floatangle = (10000 * ( theta * 0.87266 + 2.3562) );
 
@@ -133,13 +127,7 @@ void output(float theta, int effort) {                    //////////////////////
     //   PORTB &= ~(B00000100);
     digitalWrite(IN_1, HIGH);
     //   PORTB |= (B00001000);
-
   }
-
-
-
-
-
 }
 
 
@@ -224,6 +212,22 @@ void serialCheck() {
           
           break;
         }
+        case 'f':
+        {
+            readEncoderNew(0);
+            break;
+        }
+        case 'h':
+        {
+            readEncoderNew(1);
+            break;
+        }
+        case 'g':
+        {
+            readEncoder();
+            break;  
+        }
+
 
       default:
         break;
@@ -232,6 +236,7 @@ void serialCheck() {
 
 }
 
+// Display the various parameters
 
 void parameterQuery() {
   SerialUSB.println(' ');
@@ -445,7 +450,7 @@ void setupTCInterrupts() {
   // Enable InterruptVector
   NVIC_EnableIRQ(TC5_IRQn);
 
-
+    
   // Enable TC
   //  TC5->COUNT16.CTRLA.reg |= TC_CTRLA_ENABLE;
   //  WAIT_TC16_REGS_SYNC(TC5)
@@ -469,35 +474,6 @@ void disableTCInterrupts() {
 }
 
 
-void antiCoggingCal() {
-  SerialUSB.println(" -----------------BEGIN ANTICOGGING CALIBRATION!----------------");
-  mode = 'x';
-  r = lookup_angle(1);
-  enableTCInterrupts();
-  delay(1000);
-
-
-  for (int i = 1; i < 657; i++) {
-    r = lookup_angle(i);
-    SerialUSB.print(r, DEC);
-    SerialUSB.print(" , ");
-    delay(100);
-    SerialUSB.println(u, DEC);
-  }
-  SerialUSB.println(" -----------------REVERSE!----------------");
-
-  for (int i = 656; i > 0; i--) {
-    r = lookup_angle(i);
-    SerialUSB.print(r, DEC);
-    SerialUSB.print(" , ");
-    delay(100);
-    SerialUSB.println(u, DEC);
-  }
-  SerialUSB.println(" -----------------DONE!----------------");
-  disableTCInterrupts();
-}
- 
- 
 void parameterEditmain() {
 
     SerialUSB.println();
