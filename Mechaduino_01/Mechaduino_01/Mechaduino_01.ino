@@ -56,7 +56,7 @@ https://creativecommons.org/licenses/by-sa/4.0/
 
 */
 
-
+#include "Commands.h"
 #include "Utils.h"
 #include "Parameters.h"
 #include "State.h"
@@ -101,7 +101,7 @@ void setup() {
 void loop()
 {
   
-  serialCheck();
+  processCommands();
   
   //r=0.1125*step_count;
 

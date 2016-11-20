@@ -1,3 +1,5 @@
+
+
 //Contains TC5 Controller definition
 //The main control loop is executed by the TC5 timer interrupt:
 
@@ -36,8 +38,8 @@ void TC5_Handler()
 
 
 
-    a = readEncoder();
-    y = lookup_angle(a);
+    raw_encoder = readEncoder();
+    y = lookup_angle(raw_encoder);
 
 
     if ((y - y_1) < -180.0) {

@@ -54,7 +54,7 @@
 
 
 // Measured angle without comp Fields
-#define ANGLEUNC_CORDICANG  (0x3FFF << 0)   // (R) Angle information without dynamic angle error compensation
+#define ANGLEUNC_CORDICANG  (0x3FFF << 0)   // (R) Angle information without dynamic angle error compensation 
 
 // Measured angle with comp Fields
 #define ANGLE_COM_DAECANG   (0x3FFF << 0)  // (R) Angle information without dynamic angle error compensation

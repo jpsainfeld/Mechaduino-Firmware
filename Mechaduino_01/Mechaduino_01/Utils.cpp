@@ -16,225 +16,13 @@
 
 
 
-void setupPins() {
-
-  pinMode(VREF_2, OUTPUT);
-  pinMode(VREF_1, OUTPUT);
-  pinMode(IN_4, OUTPUT);
-  pinMode(IN_3, OUTPUT);
-  pinMode(IN_2, OUTPUT);
-  pinMode(IN_1, OUTPUT);
-  pinMode(pulse, OUTPUT);
-  pinMode(step_pin, INPUT);
-  pinMode(dir_pin, INPUT);
-
-  pinMode(3, OUTPUT);
-  pinMode(4, OUTPUT);
-
-  attachInterrupt(1, stepInterrupt, RISING);
 
 
 
-  analogFastWrite(VREF_2, 64);
-  analogFastWrite(VREF_1, 64);
-
-  digitalWrite(IN_4, HIGH);
-  digitalWrite(IN_3, LOW);
-  digitalWrite(IN_2, HIGH);
-  digitalWrite(IN_1, LOW);
-
-  pinMode(ledPin, OUTPUT); // visual signal of I/O to chip
-  // pinMode(clockPin, OUTPUT); // SCK
-  pinMode(chipSelectPin, OUTPUT); // CSn -- has to toggle high and low to signal chip to start data transfer
-  //  pinMode(inputPin, INPUT); // SDA
 
 
 
-}
 
-// SPI Initialization
-
-void setupSPI() {
-    AS5047D_Init();
-}
-
-// Step Interrupt Handler
-
-void stepInterrupt() {
-  if (digitalRead(dir_pin))
-  {
-    step_count += 1;
-  }
-  else
-  {
-    step_count -= 1;
-  }
-
-
-}
-
-// A4954 function
-void output(float theta, int effort) {                    //////////////////////////////////////////   OUTPUT   ///////////////////
-  static int start = 0;
-  static int finish = 0;
-  static int intangle;
-  static float floatangle;
-  static int modangle;
-
-
-
-  floatangle = (10000 * ( theta * 0.87266 + 2.3562) );//0.7854) );// 2.3562) );       //changed to 2.3 for NEMA23,NEMA17 dual..... opposite below
-  //floatangle = (10000 * ( theta * 0.87266 + 0.7854) );
-
-  intangle = (int)floatangle;
-  //  modangle = (((intangle % 628) + 628) % 628);
-  val1 = effort * lookup_sine(intangle);
-
-  analogFastWrite(VREF_2, abs(val1));
-
-  if (val1 >= 0)  {
-    digitalWrite(IN_4, HIGH);
-    //     PORTB |= (B00000001);
-    digitalWrite(IN_3, LOW);
-    //    PORTB &= ~(B00000010);
-
-  }
-  else  {
-    digitalWrite(IN_4, LOW);
-    //  PORTB &= ~(B00000001);
-    digitalWrite(IN_3, HIGH);
-    //    PORTB |= (B00000010);
-
-  }
-  floatangle = (10000 * (  theta * 0.8726646 + 0.7854) );//2.3562) );//0.7854) );
-  //floatangle = (10000 * ( theta * 0.87266 + 2.3562) );
-
-  intangle = (int)floatangle;
-  // modangle = (((intangle % 628) + 628) % 628);
-  val2 = effort * lookup_sine(intangle);
-
-  analogFastWrite(VREF_1, abs(val2));
-
-  if (val2 >= 0)  {
-    digitalWrite(IN_2, HIGH);
-    //     PORTB |= (B00000100);
-    digitalWrite(IN_1, LOW);
-    //     PORTB &= ~(B00001000);
-
-  }
-  else  {
-    digitalWrite(IN_2, LOW);
-    //   PORTB &= ~(B00000100);
-    digitalWrite(IN_1, HIGH);
-    //   PORTB |= (B00001000);
-  }
-}
-
-
-
-void serialCheck() {
-
-  if (SerialUSB.available()) {
-
-    char inChar = (char)SerialUSB.read();
-
-    switch (inChar) {
-
-
-      case 'p':             //print
-        print_angle();
-        break;
-
-      case 's':             //step
-        oneStep();
-        print_angle();
-        break;
-
-      case 'd':             //dir
-        if (dir == 1) {
-          dir = 0;
-        }
-        else {
-          dir = 1;
-        }
-        break;
-
-      case 'w':
-        calibration();           //calibration routine
-        break;
-
-      case 'e':
-        readEncoderDiagnostics();   //encoder error?
-        break;
-
-      case 'y':
-        enableTCInterrupts();      //enable closed loop
-        break;
-
-      case 'n':
-        disableTCInterrupts();      //disable closed loop
-        break;
-
-      case 'r':             //new setpoint
-        SerialUSB.println("Enter setpoint:");
-        while (SerialUSB.available() == 0)  {}
-        r = SerialUSB.parseFloat();
-        SerialUSB.println(r);
-        break;
-
-      case 'x':
-        mode = 'x';           //position loop
-        break;
-
-      case 'v':
-        mode = 'v';           //velocity loop
-        break;
-
-      case 't':
-        mode = 't';           //torque loop
-        break;
-
-      case 'c':
-        mode = 'c';           //custom loop
-        break;
-
-      case 'q':
-        parameterQuery();     // prints copy-able parameters
-        break;
-
-      case 'a':             //anticogging
-        antiCoggingCal();
-        break;
-
-      case 'k':
-        { 
-          parameterEditmain();
-          
-          break;
-        }
-        case 'f':
-        {
-            readEncoderNew(0);
-            break;
-        }
-        case 'h':
-        {
-            readEncoderNew(1);
-            break;
-        }
-        case 'g':
-        {
-            readEncoder();
-            break;  
-        }
-
-
-      default:
-        break;
-    }
-  }
-
-}
 
 // Display the various parameters
 
@@ -297,58 +85,43 @@ float lookup_angle(int n)
   return a_out;
 }
 
-void oneStep() {           /////////////////////////////////   oneStep    ///////////////////////////////
 
-  if (dir == 0) {
-    stepNumber += 1;
-  }
-  else {
-    stepNumber -= 1;
-  }
-  // step_state = ((((stepNumber) % 4) + 4) % 4); // arduino mod does not wrap for negative....
-
-  //output(1.8 * step_state, 128); //1.8 = 90/50
-
-  output(1.8 * stepNumber, 64); //1.8 = 90/50
-
-  delay(10);
-}
 
 
 
 
 void print_angle()                ///////////////////////////////////       PRINT_ANGLE   /////////////////////////////////
 {
-  a = 0;
+  raw_encoder = 0;
   delay(100);
-  a += readEncoder();
+  raw_encoder += readEncoder();
   delay(10);
-  a += readEncoder();
+  raw_encoder += readEncoder();
   delay(10);
-  a += readEncoder();
+  raw_encoder += readEncoder();
   delay(10);
-  a += readEncoder();
+  raw_encoder += readEncoder();
   delay(10);
-  a += readEncoder();
+  raw_encoder += readEncoder();
   delay(10);
-  a += readEncoder();
+  raw_encoder += readEncoder();
   delay(10);
-  a += readEncoder();
+  raw_encoder += readEncoder();
   delay(10);
-  a += readEncoder();
+  raw_encoder += readEncoder();
   delay(10);
-  a += readEncoder();
+  raw_encoder += readEncoder();
   delay(10);
-  a += readEncoder();
+  raw_encoder += readEncoder();
   delay(10);
-  a = a / 10;
+  raw_encoder = raw_encoder / 10;
 
-  anglefloat = a * 0.02197265625;
+  anglefloat = raw_encoder * 0.02197265625;  // 360 : 16384   14 bits
   SerialUSB.print(stepNumber, DEC);
   SerialUSB.print(" , ");
   SerialUSB.print(stepNumber * aps, DEC);
   SerialUSB.print(" , ");
-  SerialUSB.print(a, DEC);
+  SerialUSB.print(raw_encoder, DEC);
   SerialUSB.print(" , ");
   SerialUSB.println(anglefloat, DEC);
 }
@@ -474,6 +247,8 @@ void disableTCInterrupts() {
 }
 
 
+ 
+ 
 void parameterEditmain() {
 
     SerialUSB.println();
@@ -645,30 +420,4 @@ void parameterEdito(){
         }
 }
 
-void hybridStep(){
-  static int missed_steps = 0;
-  static float iLevel = 0.6;  //hybrid stepping current level.  In this mode, this current is continuous (unlike closed loop mode). Be very careful raising this value as you risk overheating the A4954 driver!
-  static float rSense = 0.15;
-
-  a = readEncoder();
-  y = lookup_angle(a);
-  if ((y - y_1) < -180.0) {
-    wrap_count += 1;
-  }
-  else if ((y - y_1) > 180.0) {
-    wrap_count -= 1;
-  }
-  y_1 = y; 
-
-  yw = (y + (360.0 * wrap_count));
-  
-  if (yw < 0.1125*step_count-1.8) {
-    missed_steps -= 1;
-  }
-  else if (yw > 0.1125*step_count+1.8) {
-    missed_steps += 1;
-  }
- // SerialUSB.println(missed_steps,DEC);
-  output(0.1125 *(step_count+missed_steps), (255/3.3)*(iLevel*10*rSense)); 
-}
 

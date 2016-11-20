@@ -21,12 +21,18 @@ extern volatile float vKd;
 //////////////////////////////////////
 //////////////////PINS////////////////
 //////////////////////////////////////
-extern int IN_4;
-extern int IN_3;
-extern int VREF_2;
-extern int VREF_1;
-extern int IN_2;
-extern int IN_1;
+extern int IN_4;        // A4954 Logic Input 4
+extern int IN_3;        // A4954 Logic Input 3
+extern int VREF_2;      // A4954 Analog input for bridge 3-4
+extern int VREF_1;      // A4954 Analog input for bridge 1-2
+extern int IN_2;        // A4954 Logic Input 2
+extern int IN_1;        // A4954 Logic Input 1
+
+
+
+
+
+
 extern int pulse;
 extern const int ledPin;
 extern const int chipSelectPin;
@@ -52,7 +58,7 @@ extern long angle; //holds processed angle value
 
 extern float anglefloat;
 
-extern int a;  // raw encoder value in closed loop and print_angle routine (should fix the latter to include LUT)
+extern int raw_encoder;  // raw encoder value in closed loop and print_angle routine (should fix the latter to include LUT)
 
 
 extern volatile long step_count;  //For step/dir interrupt
