@@ -92,6 +92,9 @@ float lookup_angle(int n)
 
 void print_angle()                ///////////////////////////////////       PRINT_ANGLE   /////////////////////////////////
 {
+  // We average the reading of the encoder over 10 samples
+  // we may want to have rather a function encoderAverage with a input parameter indicating the number of samples the average 
+  // should be calculated over 
   raw_encoder = 0;
   delay(100);
   raw_encoder += readEncoder();
@@ -136,12 +139,16 @@ void receiveEvent(int howMany)
   }
   int x = Wire.read();    // receive byte as an integer
   SerialUSB.println(x);         // print the integer
-  r = 0.1 * ((float)x);
+  r = 0.1 * ((float)x);   // r is a global find a better name for it
 }
+
+
+
 
 int mod(int xMod, int mMod) {
   return (xMod % mMod + mMod) % mMod;
 }
+
 
 
 float lookup_force(int m)        /////////////////////////////////////////////////  LOOKUP_force   /////////////////////////////
@@ -165,6 +172,10 @@ float lookup_force(int m)        ///////////////////////////////////////////////
   return b_out;
 }
 
+
+
+
+
 float lookup_sine(int m)        /////////////////////////////////////////////////  LOOKUP_SINE   /////////////////////////////
 {
   float b_out;
@@ -185,6 +196,12 @@ float lookup_sine(int m)        ////////////////////////////////////////////////
 
   return b_out;
 }
+
+
+
+// This function requires the understanding of the interal features of the SOC 
+// In this particular case we manipulate the register used in controlling the 
+// Timers
 
 
 void setupTCInterrupts() {

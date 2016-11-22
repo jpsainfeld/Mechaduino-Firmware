@@ -4,22 +4,17 @@
 #define __UTIL_H__
 
 
-	void setupPins();
-	
-	void setupSPI();
 		
 	void stepInterrupt();
 
 	void output(float theta, int effort);	
 
 		
-	void serialCheck();
 
 	void parameterQuery();
 	
 	float lookup_angle(int n);
 	
-	void oneStep(void);
 		
 	void print_angle();
 		
@@ -37,7 +32,6 @@
 	
 	void disableTCInterrupts();
 	
-	void antiCoggingCal();
 	
 	void parameterEditmain();
 	

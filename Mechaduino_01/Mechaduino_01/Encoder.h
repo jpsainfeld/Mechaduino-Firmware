@@ -4,7 +4,7 @@
 #ifndef __ENCODER_H__
 #define __ENCODER_H__
 
-	int readEncoder();
+    int readEncoder();
     unsigned short readEncoderNew(int comp);
     void readEncoderDiagnostics();
     void readEncoderDiagnosticsNew();
