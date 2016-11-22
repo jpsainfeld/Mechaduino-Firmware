@@ -80,19 +80,19 @@ void TC5_Handler()
       case 'v':
 
 
-        e = (r - ((yw - yw_1) * Fs*0.16666667));//error in degrees per rpm (sample frequency in Hz * (60 seconds/min) / (360 degrees/rev) )
+        e = (r - ((yw - yw_1) * Fs * 0.16666667));  //error in degrees per rpm (sample frequency in Hz * (60 seconds/min) / (360 degrees/rev) )
 
         ITerm += (vKi * e);
         if (ITerm > 200) ITerm = 200;
         else if (ITerm < -200) ITerm = -200;
 
 
-        u = ((vKp * e) + ITerm - (vKd * (yw - yw_1)));//+ lookup_force(a)-20; //ARDUINO library style
+        u = ((vKp * e) + ITerm - (vKd * (yw - yw_1)));        //+ lookup_force(a)-20;      //ARDUINO library style
 
         break;
 
       case 't':
-        u = 1.0 * r ;//+ 1.7*(lookup_force(a)-20);
+        u = 1.0 * r ;                   //+ 1.7 * (lookup_force(a) - 20);
         break;
 
       default:
